@@ -2,7 +2,7 @@ from expressions import *
 import math
 
 def accurate(expr, env):
-    return round(evaluate(expr,env))
+    return round(evaluate(expr,env),12)
 
 def evaluate(expr, env) -> float:
     match expr:
