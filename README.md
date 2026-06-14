@@ -91,3 +91,4 @@ primary    := NUMBER | IDENTIFIER | IDENTIFIER '(' expression ')' | '(' expressi
 - `Const` stores a `float`, so results can have floating-point imprecision
   (e.g. `0.1 + 0.2 != 0.3` exactly). No exact rational arithmetic (`Fraction`) yet.
 - No support for multi-argument functions (e.g. `log(x, 2)`).
+- Yet to add Latex writing 

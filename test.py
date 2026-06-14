@@ -1,32 +1,19 @@
 from tokeniser import tokenise
 from parser import Parser
 from simplify import simplify
+from differentiate import differentiate
 
-tests = [
-    "2 + 3 * 4",
-    "(2+3)*4",
-    "x + 0",
-    "0 + x",
-    "x * 1",
-    "1 * x",
-    "x * 0",
-    "0 * x",
-    "x - x",
-    "x / x",
-    "x ^ 0",
-    "x ^ 1",
-    "0 ^ x",
-    "1 ^ x",
-    "--x",
-    "-(-x)",
-    "0 - x",
-    "(2+3)*x",
-    "sin(0+x)",
+diff_tests = [
+    ("x^2", "x"),
+    ("sin(x^2)", "x"),
+    ("e^(2*x)", "x"),
+    ("log(sin(x))", "x"),
+    ("x^x", "x"),
+    ("tan(x)/x", "x"),
+    ("sin(x)*cos(x)", "x"),
 ]
 
-for text in tests:
-    ast = Parser(tokenise(text)).parse()
-    simplified = simplify(ast)
-    print(f"{text:15} -> raw: {ast}")
-    print(f"{'':15}    simplified: {simplified}")
-    print()
+
+for test in diff_tests:
+    print(simplify(differentiate((Parser(tokenise(test[0]))).parse(), "x")))
+    

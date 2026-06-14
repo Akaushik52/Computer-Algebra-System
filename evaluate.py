@@ -1,6 +1,9 @@
 from expressions import *
 import math
 
+def accurate(expr, env):
+    return round(evaluate(expr,env))
+
 def evaluate(expr, env) -> float:
     match expr:
         case Var(x):

@@ -1,6 +1,14 @@
 from expressions import *
+from evaluate import *
 
-def simplify(expr : Expr):
+def fold(node, x):
+    x = simplify(x)
+    if isinstance(x, Const):
+        return Const(accurate(node(x), {}))
+    return node(x)
+
+
+def simplify(expr : Expr) -> Expr:
     match expr:
         case Var(_) | Const(_):
             return expr
@@ -59,6 +67,16 @@ def simplify(expr : Expr):
                     return Const(0)
                 case (_, Const(0)):
                     return Const(0)
+                case (_, Div(Const(1), b)) if l == b:
+                    return Const(1)
+                case (Div(Const(1), b), _) if r == b:
+                    return Const(1)
+                case (Neg(a), Neg(b)):
+                    return simplify(Mul(a, b))
+                case (_, Neg(b)):
+                    return simplify(Neg(Mul(l, b)))
+                case (Neg(a), _):
+                    return simplify(Neg(Mul(a, r)))
                 case _:
                     return Mul(l, r)
                 
@@ -98,28 +116,28 @@ def simplify(expr : Expr):
                     return Pow(l, r)
                 
         case Sin(x):
-            return Sin(simplify(x))
+            return fold(Sin, x)
                 
         case Cos(x):
-            return Cos(simplify(x))
+            return fold(Cos, x)
                 
         case Tan(x):
-            return Tan(simplify(x))
+            return fold(Tan, x)
                 
         case Cot(x):
-            return Cot(simplify(x))
+            return fold(Cot, x)
                 
         case Sec(x):
-            return Sec(simplify(x))
+            return fold(Sec, x)
                 
         case Csc(x):
-            return Csc(simplify(x))
+            return fold(Csc, x)
                 
         case Exp(x):
-            return Exp(simplify(x))
+            return fold(Exp, x)
                 
         case Log(x):
-            return Log(simplify(x))
+            return fold(Log, x)
 
         case _:
             raise NotImplementedError(f"Can't simplify {expr}")
