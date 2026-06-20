@@ -7,6 +7,9 @@ class Expr:
     def simple(self):
         raise NotImplementedError
     
+    def latex(self):
+        raise NotImplementedError
+    
     def __add__(self,other):
         return Add(self,other)
     
@@ -28,6 +31,9 @@ class Var(Expr):
 
     def simple(self):
         return self.name
+    
+    def latex(self):
+        return self.name
 
 @dataclass(frozen=True)
 class Const(Expr):
@@ -36,12 +42,18 @@ class Const(Expr):
     def simple(self):
         return str(self.value)
     
+    def latex(self):
+        return str(self.value)
+    
 @dataclass(frozen=True)
 class Neg(Expr):
     inp : Expr
 
     def simple(self):
-        return f"-{self.inp}" 
+        return f"-{self.inp}"
+    
+    def latex(self):
+        return f"-{self.inp.latex()}"
 
 @dataclass(frozen=True)
 class Add(Expr):
@@ -50,6 +62,9 @@ class Add(Expr):
 
     def simple(self):
         return f"({self.first}+{self.second})"
+    
+    def latex(self):
+        return f"\\left({self.first.latex()}+{self.second.latex()}\\right)"
 
 @dataclass(frozen=True)
 class Sub(Expr):
@@ -58,6 +73,9 @@ class Sub(Expr):
 
     def simple(self):
         return f"({self.first}-{self.second})"
+    
+    def latex(self):
+        return f"\\left({self.first.latex()}-{self.second.latex()}\\right)"
 
 @dataclass(frozen=True)
 class Mul(Expr):
@@ -66,6 +84,9 @@ class Mul(Expr):
     
     def simple(self):
         return f"({self.first}*{self.second})"
+    
+    def latex(self):
+        return f"{self.first.latex()} \\cdot {self.second.latex()}"
 
 @dataclass(frozen=True)
 class Div(Expr):
@@ -74,6 +95,9 @@ class Div(Expr):
 
     def simple(self):
         return f"({self.first}/{self.second})"
+    
+    def latex(self):
+        return f"\\frac{{{self.first.latex()}}}{{{self.second.latex()}}}"
 
 @dataclass(frozen=True)
 class Pow(Expr):
@@ -82,6 +106,9 @@ class Pow(Expr):
     
     def simple(self):
         return f"({self.first}^{self.second})"
+    
+    def latex(self):
+        return f"\\left({self.first.latex()}\\right)^{{{self.second.latex()}}}"
 
 @dataclass(frozen=True)
 class Sin(Expr):
@@ -90,12 +117,18 @@ class Sin(Expr):
     def simple(self):
         return f"sin({self.inp})"
 
+    def latex(self):
+        return f"\\sin\\left({self.inp.latex()}\\right)"
+
 @dataclass(frozen=True)
 class Cos(Expr):
     inp : Expr
 
     def simple(self):
         return f"cos({self.inp})"
+
+    def latex(self):
+        return f"\\cos\\left({self.inp.latex()}\\right)"
 
 @dataclass(frozen=True)
 class Tan(Expr):
@@ -104,12 +137,18 @@ class Tan(Expr):
     def simple(self):
         return f"tan({self.inp})"
 
+    def latex(self):
+        return f"\\tan\\left({self.inp.latex()}\\right)"
+
 @dataclass(frozen=True)
 class Cot(Expr):
     inp : Expr
 
     def simple(self):
         return f"cot({self.inp})"
+
+    def latex(self):
+        return f"\\cot\\left({self.inp.latex()}\\right)"
 
 @dataclass(frozen=True)
 class Sec(Expr):
@@ -118,12 +157,18 @@ class Sec(Expr):
     def simple(self):
         return f"sec({self.inp})"
 
+    def latex(self):
+        return f"\\sec\\left({self.inp.latex()}\\right)"
+
 @dataclass(frozen=True)
 class Csc(Expr):
     inp : Expr
 
     def simple(self):
         return f"cosec({self.inp})"
+
+    def latex(self):
+        return f"\\csc\\left({self.inp.latex()}\\right)"
 
 @dataclass(frozen=True)
 class Exp(Expr):
@@ -132,9 +177,15 @@ class Exp(Expr):
     def simple(self):
         return f"exp({self.inp})"
 
+    def latex(self):
+        return f"e^{{{self.inp.latex()}}}"
+
 @dataclass(frozen=True)
 class Log(Expr):
     inp : Expr
 
     def simple(self):
         return f"log({self.inp})"
+
+    def latex(self):
+        return f"\\log\\left({self.inp.latex()}\\right)"
