@@ -4,6 +4,7 @@ from parser import Parser
 from simplify import simplify
 from differentiate import differentiate
 from evaluate import evaluate
+from integrate import integrate
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -55,7 +56,7 @@ with col2:
 
 mode = st.radio(
     "Operation",
-    ["Simplify", "Evaluate", "Differentiate"],
+    ["Simplify", "Evaluate", "Differentiate", "Integrate"],
     horizontal=True,
 )
 
@@ -88,6 +89,7 @@ if expr_str and var:
         simplified_input = simplify(ast)
         if str(simplified_input) != str(ast):
             result_block("Simplified input", simplified_input)
+        ast = simplified_input
 
         st.divider()
 
@@ -107,6 +109,13 @@ if expr_str and var:
                     f'{round(d_val, 10)}</span></div>',
                     unsafe_allow_html=True,
                 )
+
+        # ── Integrate ──────────────────────────────────────────────────────────
+        elif mode  == "Integrate":
+            raw = integrate(ast, var)
+            final = simplify(raw)
+
+            result_block(f"∫ d{var}", final)
 
         # ── Simplify ───────────────────────────────────────────────────────────
         elif mode == "Simplify":

@@ -1,5 +1,6 @@
 from expressions import *
-from tokeniser import *
+from tokeniser import Token
+from definitions import *
 
 class Parser:
     def __init__(self,tokens : list):

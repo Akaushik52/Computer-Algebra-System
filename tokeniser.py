@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Constants import *
+from definitions import *
 
 @dataclass(frozen=True)
 class Token:
