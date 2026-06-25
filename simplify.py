@@ -3,7 +3,7 @@ from evaluate import accurate
 
 def fold(node, x):
     x = simplify(x)
-    if isinstance(x, (Const, Pi)):
+    if isinstance(x, (Const, Pi, E)):
         return Const(accurate(node(x), {}))
     return node(x)
 
