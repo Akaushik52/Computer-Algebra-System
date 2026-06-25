@@ -10,7 +10,7 @@ def fold(node, x):
 
 def simplify(expr : Expr) -> Expr:
     match expr:
-        case Var(_) | Const(_):
+        case Var(_) | Const(_) | E() | Pi():
             return expr
         
         case Neg(x):
@@ -116,29 +116,53 @@ def simplify(expr : Expr) -> Expr:
                     return Pow(l, r)
                 
         case Sin(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Neg(Sin(x.inp))
             return fold(Sin, x)
                 
         case Cos(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Cos(x.inp)
             return fold(Cos, x)
                 
         case Tan(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Neg(Tan(x.inp))
             return fold(Tan, x)
                 
         case Cot(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Cot(x.inp)
             return fold(Cot, x)
                 
         case Sec(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Sec(x.inp)
             return fold(Sec, x)
                 
         case Csc(x):
+            x = simplify(x)
+            if isinstance(x, Neg):
+                return Neg(Csc(x.inp))
             return fold(Csc, x)
                 
         case Exp(x):
+            x = simplify(x)
+            if isinstance(x, Log):
+                return x.inp
             return fold(Exp, x)
                 
         case Log(x):
+            x = simplify(x)
             if isinstance(x, E):
                 return Const(1)
+            if isinstance(x, Exp):
+                return x.inp
             return fold(Log, x)
 
         case _:
