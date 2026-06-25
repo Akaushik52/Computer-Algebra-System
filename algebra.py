@@ -36,13 +36,4 @@ def substitute(expr, old, new) -> Expr:
         
         case _:
             return expr        
-
-
-from tokeniser import tokenise
-from parser import Parser
-
-ast = Parser(tokenise("sin(x) + x^2")).parse()
-x   = Var("x")
-u   = Var("u")
-print(substitute(ast, x, u))   # should give sin(u)+u^2
         
