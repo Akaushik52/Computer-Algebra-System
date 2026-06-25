@@ -1,4 +1,4 @@
-# Differentiate
+# Computer Algebra System
 
 A small Computer Algebra System (CAS) in Python, built from scratch, focused on symbolic differentiation.
 
