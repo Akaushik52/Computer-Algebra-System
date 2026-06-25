@@ -1,9 +1,9 @@
 from expressions import *
-from evaluate import *
+from evaluate import accurate
 
 def fold(node, x):
     x = simplify(x)
-    if isinstance(x, Const):
+    if isinstance(x, (Const, Pi)):
         return Const(accurate(node(x), {}))
     return node(x)
 
@@ -137,6 +137,8 @@ def simplify(expr : Expr) -> Expr:
             return fold(Exp, x)
                 
         case Log(x):
+            if isinstance(x, E):
+                return Const(1)
             return fold(Log, x)
 
         case _:

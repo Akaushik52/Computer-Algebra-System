@@ -32,8 +32,10 @@ FUNCTION_MAP ={
     "sec": Sec,
     "cosec": Csc,
     "exp": Exp,
-    "log": Log
+    "log": Log,
 }
 
-E = 2.718281828459045
-PI = 3.141592653589793
+CONSTANTS ={
+    "e" : E,
+    "pi": Pi
+}

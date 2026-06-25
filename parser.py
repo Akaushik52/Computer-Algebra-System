@@ -35,8 +35,8 @@ class Parser:
         
         elif token.type == IDENTIFIER:
             if self.peek().type != LPAREN:
-                if token.value == "e":
-                   return Const(E)
+                if token.value in CONSTANTS:
+                    return CONSTANTS[token.value]()
                 return Var(token.value)
             
             else:

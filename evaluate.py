@@ -56,6 +56,12 @@ def evaluate(expr, env) -> float:
         
         case Log(i):
             return math.log(evaluate(i,env))
-
+        
+        case E():
+            return math.e
+        
+        case Pi():
+            return math.pi  
+        
         case _:
             raise NotImplementedError(f"Don't know how to evaluate {expr}")

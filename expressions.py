@@ -108,7 +108,10 @@ class Pow(Expr):
         return f"({self.first}^{self.second})"
     
     def latex(self):
-        return f"\\left({self.first.latex()}\\right)^{{{self.second.latex()}}}"
+        base = self.first.latex()
+        if isinstance(self.first, (Var, Const, E, Pi)):
+            return f"{base}^{{{self.second.latex()}}}"
+        return f"\\left({base}\\right)^{{{self.second.latex()}}}"
 
 @dataclass(frozen=True)
 class Sin(Expr):
@@ -189,3 +192,19 @@ class Log(Expr):
 
     def latex(self):
         return f"\\log\\left({self.inp.latex()}\\right)"
+    
+@dataclass(frozen=True)
+class Pi(Expr):
+    def simple(self):
+        return "pi"
+    
+    def latex(self): 
+        return "\\pi"
+
+@dataclass(frozen=True)
+class E(Expr):
+    def simple(self):
+        return "e"
+
+    def latex(self): 
+        return "e"
