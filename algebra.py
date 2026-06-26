@@ -11,8 +11,14 @@ def free_variables(expr: Expr) -> set:
         case Neg(x) | Sin(x) | Cos(x) | Tan(x) | Cot(x) | Sec(x) | Csc(x) | Exp(x) | Log(x):
             return free_variables(x)
         
-        case Add(l, r) | Sub(l, r) | Mul(l, r) | Div(l, r) | Pow(l, r):
+        case Pow(l, r):
             return free_variables(l) | free_variables(r)
+        
+        case Add(args) | Mul(args):
+            s = set()
+            for a in args:
+                s |= free_variables(a)
+            return s
         
         case _:
             return set()
@@ -31,8 +37,12 @@ def substitute(expr, old, new) -> Expr:
         case Neg(x) | Sin(x) | Cos(x) | Tan(x) | Cot(x) | Sec(x) | Csc(x) | Exp(x) | Log(x):
             return type(expr)(substitute(x, old, new))
         
-        case Add(l, r) | Sub(l, r) | Mul(l, r) | Div(l, r) | Pow(l, r):
+        case Pow(l, r):
             return type(expr)(substitute(l, old, new), substitute(r, old, new))
+        
+        case Add(args) | Mul(args):
+            args = [substitute(a, old, new) for a in args]
+            return type(expr)(tuple(args))
         
         case _:
             return expr        

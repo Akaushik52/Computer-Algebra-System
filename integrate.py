@@ -3,11 +3,11 @@ from expressions import *
 def integrate(expr : Expr , var) -> Expr: 
     match expr:
         case Const(_):
-            return Mul(expr,Var(var))
+            return Mul((expr,Var(var)))
         
         case Var(v):
             if(v == var):
-                return Div(Pow(expr,Const(2)),Const(2))
+                return Mul((Pow(expr,Const(2)),Pow(Const(2),Const(-1))))
             return expr
         
         case Neg(x): 
@@ -17,17 +17,11 @@ def integrate(expr : Expr , var) -> Expr:
             if(v == var):
                 if(c == -1):
                     return Log(Var(v))
-                return Div(Pow(Var(v),Const(c+1)),Const(c+1))
+                return Mul((Pow(Var(v),Const(c+1)),Pow(Const(c+1),Const(-1))))
             return expr
             
-        case Add(l, r):
-            return Add(integrate(l, var),integrate(r, var))
-        
-        case Sub(l, r):
-            return Sub(integrate(l, var),integrate(r, var))
-        
-        case Mul(Const(c),x) | Mul(x,Const(c)):
-            return Mul(Const(c),integrate(x, var))
+        case Add(args):
+            return Add(tuple(integrate(a, var) for a in args))
         
         case Sin(x): 
             return Neg(Cos(x))

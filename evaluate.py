@@ -18,17 +18,17 @@ def evaluate(expr, env) -> float:
         case Neg(x):
             return -1 * evaluate(x, env)
         
-        case Add(l, r):
-            return evaluate(l, env) + evaluate(r, env)
-
-        case Sub(l, r):
-            return evaluate(l, env) - evaluate(r, env)
+        case Add(args):
+            sum = 0
+            for a in args:
+                sum += evaluate(a, env)
+            return sum            
         
-        case Mul(l,r):
-            return evaluate(l, env) * evaluate(r, env)
-
-        case Div(l, r):
-            return evaluate(l,env) / evaluate(r,env)
+        case Mul(args):
+            prod = 1
+            for a in args:
+                prod *= evaluate(a, env)
+            return prod
         
         case Pow(l,r):
             return evaluate(l, env) ** evaluate(r, env)

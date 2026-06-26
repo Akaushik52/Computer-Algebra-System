@@ -9,21 +9,6 @@ class Expr:
     
     def latex(self):
         raise NotImplementedError
-    
-    def __add__(self,other):
-        return Add(self,other)
-    
-    def __sub__(self, other):
-        return Sub(self,other)
-
-    def __mul__(self, other):
-        return Mul(self,other)
-    
-    def __truediv__(self, other):
-        return Div(self,other)
-    
-    def __pow__(self, other):
-        return Pow(self,other)
 
 @dataclass(frozen=True)
 class Var(Expr):
@@ -57,47 +42,45 @@ class Neg(Expr):
 
 @dataclass(frozen=True)
 class Add(Expr):
-    first : Expr
-    second : Expr
+    args: tuple
 
     def simple(self):
-        return f"({self.first}+{self.second})"
+        return f"({'+'.join(str(a) for a in self.args)})"
     
     def latex(self):
-        return f"\\left({self.first.latex()}+{self.second.latex()}\\right)"
-
-@dataclass(frozen=True)
-class Sub(Expr):
-    first : Expr
-    second : Expr
-
-    def simple(self):
-        return f"({self.first}-{self.second})"
-    
-    def latex(self):
-        return f"\\left({self.first.latex()}-{self.second.latex()}\\right)"
+        return f"\\left({'+'.join(a.latex() for a in self.args)}\\right)"
 
 @dataclass(frozen=True)
 class Mul(Expr):
-    first : Expr
-    second : Expr
-    
-    def simple(self):
-        return f"({self.first}*{self.second})"
-    
-    def latex(self):
-        return f"{self.first.latex()} \\cdot {self.second.latex()}"
-
-@dataclass(frozen=True)
-class Div(Expr):
-    first : Expr
-    second : Expr
+    args: tuple
 
     def simple(self):
-        return f"({self.first}/{self.second})"
+        return f"({"*".join(str(a) for a in self.args)})"
     
     def latex(self):
-        return f"\\frac{{{self.first.latex()}}}{{{self.second.latex()}}}"
+        return f"{"\\cdot ".join(a.latex() for a in self.args)}"
+
+# @dataclass(frozen=True)
+# class Sub(Expr):
+#     first : Expr
+#     second : Expr
+
+#     def simple(self):
+#         return f"({self.first}-{self.second})"
+    
+#     def latex(self):
+#         return f"\\left({self.first.latex()}-{self.second.latex()}\\right)"
+    
+# @dataclass(frozen=True)
+# class Div(Expr):
+#     first : Expr
+#     second : Expr
+
+#     def simple(self):
+#         return f"({self.first}/{self.second})"
+    
+#     def latex(self):
+#         return f"\\frac{{{self.first.latex()}}}{{{self.second.latex()}}}"
 
 @dataclass(frozen=True)
 class Pow(Expr):

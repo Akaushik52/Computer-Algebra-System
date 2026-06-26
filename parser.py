@@ -78,29 +78,27 @@ class Parser:
             return self.parse_power()
 
     def parse_term(self):
-        left = self.parse_unary()
+        args = [self.parse_unary()]
         
         while self.peek().type == MUL or self.peek().type == DIV:
             operator = self.consume()
             right = self.parse_unary()
-
             if operator.type == MUL:
-                left = Mul(left,right)
+                args.append(right)
             else:
-                left = Div(left,right)
-
-        return left
+                args.append(Pow(right, Const(-1)))
+        
+        return args[0] if len(args) == 1 else Mul(tuple(args))
 
     def parse_expr(self):
-        left = self.parse_term()
+        args = [self.parse_term()]
 
         while self.peek().type == PLUS or self.peek().type == MINUS:
             operator = self.consume()
             right = self.parse_term()
-
             if operator.type == PLUS:
-                left = Add(left,right)
+                args.append(right)
             else:
-                left = Sub(left,right)
-            
-        return left
+                args.append(Neg(right))
+        
+        return args[0] if len(args) == 1 else Add(tuple(args))
