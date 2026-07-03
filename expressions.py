@@ -60,28 +60,6 @@ class Mul(Expr):
     def latex(self):
         return f"{"\\cdot ".join(a.latex() for a in self.args)}"
 
-# @dataclass(frozen=True)
-# class Sub(Expr):
-#     first : Expr
-#     second : Expr
-
-#     def simple(self):
-#         return f"({self.first}-{self.second})"
-    
-#     def latex(self):
-#         return f"\\left({self.first.latex()}-{self.second.latex()}\\right)"
-    
-# @dataclass(frozen=True)
-# class Div(Expr):
-#     first : Expr
-#     second : Expr
-
-#     def simple(self):
-#         return f"({self.first}/{self.second})"
-    
-#     def latex(self):
-#         return f"\\frac{{{self.first.latex()}}}{{{self.second.latex()}}}"
-
 @dataclass(frozen=True)
 class Pow(Expr):
     first : Expr
@@ -191,3 +169,14 @@ class E(Expr):
 
     def latex(self): 
         return "e"
+    
+@dataclass(frozen=True)
+class Integral(Expr):
+    inp: Expr
+    var: str
+
+    def simple(self):
+        return f"∫{self.inp}d{self.var}"
+    
+    def latex(self):
+        return f"\\int {self.inp.latex()} \\, d{self.var}"

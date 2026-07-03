@@ -7,6 +7,34 @@ def fold(node, x):
         return Const(accurate(node(x), {}))
     return node(x)
 
+def _get_base_exp(expr):
+    match expr:
+        case Pow(b, e):
+            return (b, e)
+        case _:
+            return (expr, Const(1))
+
+def _get_coeff_term(expr):
+    match expr:
+        case Mul(args):
+            consts = [a for a in args if isinstance(a, Const)]
+            rest   = [a for a in args if not isinstance(a, Const)]
+            if consts:
+                coeff = Const(1)
+                for c in consts:
+                    coeff = Const(coeff.value * c.value)
+                if not rest:
+                    return (coeff, Const(1))
+                term = rest[0] if len(rest) == 1 else Mul(tuple(rest))
+                return (coeff, term)
+            return (Const(1), expr)
+        case Const(c):
+            return (Const(c), Const(1))
+        case Neg(x):
+            coeff, term = _get_coeff_term(x)
+            return (Const(-coeff.value), term)
+        case _:
+            return (Const(1), expr)
 
 def simplify(expr: Expr) -> Expr:
     match expr:
@@ -23,10 +51,10 @@ def simplify(expr: Expr) -> Expr:
                 case _:
                     return Neg(x)
 
-        case Add(args):
+        case Add(args=args):
             args = [simplify(a) for a in args]
-            flat = []
 
+            flat = []
             for a in args:
                 if isinstance(a, Add):
                     flat.extend(a.args)
@@ -34,13 +62,25 @@ def simplify(expr: Expr) -> Expr:
                     flat.append(a)
 
             flat = [a for a in flat if a != Const(0)]
-            consts = [a for a in flat if isinstance(a, Const)]
-            rest   = [a for a in flat if not isinstance(a, Const)]
 
-            if consts:
-                total = Const(sum(c.value for c in consts))
-                if total != Const(0):
-                    rest = [total] + rest        
+            term_map = {}
+            for a in flat:
+                coeff, term = _get_coeff_term(a)
+                if term in term_map:
+                    term_map[term] = Const(term_map[term].value + coeff.value)
+                else:
+                    term_map[term] = coeff
+
+            rest = []
+            for term, coeff in term_map.items():
+                if coeff == Const(0):
+                    continue
+                elif coeff == Const(1):
+                    rest.append(term)
+                elif coeff == Const(-1):
+                    rest.append(Neg(term))
+                else:
+                    rest.append(Mul((coeff, term)) if term != Const(1) else coeff)
             if not rest:
                 return Const(0)
             if len(rest) == 1:
@@ -72,14 +112,36 @@ def simplify(expr: Expr) -> Expr:
                     return Const(0)
                 if product != Const(1):
                     rest = [product] + rest
-            if not rest:
-                return Const(1)
-            if len(rest) == 1:
-                return rest[0]
 
             neg_count = sum(1 for a in rest if isinstance(a, Neg))
             rest = [a.inp if isinstance(a, Neg) else a for a in rest]
-            result = Mul(tuple(rest))
+
+            base_map = {}
+            for a in rest:
+                base, exp = _get_base_exp(a)
+                if base in base_map:
+                    base_map[base].append(exp)
+                else:
+                    base_map[base] = [exp]
+            rest = []
+            for base, exps in base_map.items():
+                if len(exps) == 1:
+                    exp = exps[0]
+                else:
+                    exp = simplify(Add(tuple(exps)))
+                if exp == Const(0):
+                    pass  
+                elif exp == Const(1):
+                    rest.append(base)
+                else:
+                    rest.append(Pow(base, exp))
+
+            if not rest:
+                result = Const(1)
+            elif len(rest) == 1:
+                result = rest[0]
+            else:
+                result = Mul(tuple(rest))
             return Neg(result) if neg_count % 2 == 1 else result
 
         case Pow(l, r):
@@ -96,8 +158,8 @@ def simplify(expr: Expr) -> Expr:
                     return Const(1)
                 case (Const(0), _):
                     return Const(0)
-                case (_, Const(-1)):
-                    return Pow(l, Const(-1)) 
+                case (Pow(base, exp), _):
+                    return simplify(Pow(base, simplify(Mul((exp, r)))))
                 case _:
                     return Pow(l, r)
 
@@ -150,6 +212,9 @@ def simplify(expr: Expr) -> Expr:
             if isinstance(x, Exp):
                 return x.inp
             return fold(Log, x)
-
+        
+        case Integral(x, v):
+            return Integral(simplify(x), v)
+        
         case _:
             raise NotImplementedError(f"Can't simplify {expr}")
