@@ -4,7 +4,8 @@ from parser import Parser
 from simplify import simplify
 from differentiate import differentiate
 from evaluate import evaluate
-from integrate import integrate
+from integrate import integrate, definite
+from expressions import Integral
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -111,11 +112,27 @@ if expr_str and var:
                 )
 
         # ── Integrate ──────────────────────────────────────────────────────────
-        elif mode  == "Integrate":
+        elif mode == "Integrate":
+            st.write(repr(ast))
             raw = integrate(ast, var)
             final = simplify(raw)
-
             result_block(f"∫ d{var}", final)
+
+            with st.expander(f"Definite Integral from a to b"):    
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    a = st.number_input("Lower bound (optional)", value=None, placeholder="a")
+                with col_b:
+                    b = st.number_input("Upper bound (optional)", value=None, placeholder="b")
+
+                if a is not None and b is not None:
+                    if isinstance(final, Integral):
+                        val = definite(ast, var, a, b)
+                        st.markdown(f'<div class="label">Definite integral (numeric) from {a} to {b}</div>', unsafe_allow_html=True)
+                    else:
+                        val = evaluate(final, {var: b}) - evaluate(final, {var: a})
+                        st.markdown(f'<div class="label">Definite integral from {a} to {b}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="result-box"><span style="font-size:1.6rem;font-weight:600;color:#e8eaf0;">{round(val, 10)}</span></div>', unsafe_allow_html=True)
 
         # ── Simplify ───────────────────────────────────────────────────────────
         elif mode == "Simplify":
@@ -134,7 +151,7 @@ if expr_str and var:
                 f'font-weight:600;color:#e8eaf0;">{round(val, 10)}</span></div>',
                 unsafe_allow_html=True,
             )
-
+    
     except ZeroDivisionError:
         st.error("Division by zero — try a different value of the variable.")
     except ValueError as e:

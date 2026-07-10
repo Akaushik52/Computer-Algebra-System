@@ -3,6 +3,14 @@ from algebra import is_constant
 from simplify import simplify
 from evaluate import evaluate
 
+def definite(expr, var, a, b, n=1000):
+    h = (b - a) / n
+    t = evaluate(expr, {var: a}) + evaluate(expr, {var: b})
+    for i in range(1, n):
+        x = a + i * h
+        c = 4 if i % 2 == 1 else 2
+        t += c * evaluate(expr, {var: x})
+    return t * h / 3
 
 def _get_ratio(rest_expr, d, var):
     ratio = simplify(Mul((rest_expr, Pow(d, Const(-1)))))
@@ -15,8 +23,8 @@ def _get_ratio(rest_expr, d, var):
         r2 = evaluate(rest_expr, env2) / evaluate(d, env2)
         if abs(r1 - r2) < 1e-10:
             return Const(r1)
-    except:
-        pass
+    except Exception:
+        return None
     return None
 
 
@@ -63,12 +71,18 @@ def integrate(expr: Expr, var: str) -> Expr:
             return Mul((expr, Var(var)))
 
         case Sin(x):
+            if is_constant(x, var):
+                return Mul((expr, Var(var)))
             return _integrate_trig(Sin, Neg(Cos(x)), x, var)
 
         case Cos(x):
+            if is_constant(x, var):
+                return Mul((expr, Var(var)))
             return _integrate_trig(Cos, Sin(x), x, var)
 
         case Exp(x):
+            if is_constant(x, var):
+                return Mul((expr, Var(var)))
             return _integrate_trig(Exp, Exp(x), x, var)
         
         case Log(x):
