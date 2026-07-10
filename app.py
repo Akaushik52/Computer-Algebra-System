@@ -113,7 +113,6 @@ if expr_str and var:
 
         # ── Integrate ──────────────────────────────────────────────────────────
         elif mode == "Integrate":
-            st.write(repr(ast))
             raw = integrate(ast, var)
             final = simplify(raw)
             result_block(f"∫ d{var}", final)
